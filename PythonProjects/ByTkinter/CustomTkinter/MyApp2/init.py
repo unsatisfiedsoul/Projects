@@ -8,6 +8,7 @@ import mysql.connector as my
 
 try:
     mydb = my.connect(
+
         host = "127.0.0.1",
         user = "root",
         password = "766900",
@@ -29,10 +30,14 @@ except:
 
     )
     print(mydb)
-    values = ("root","root")
-    query = "insert into users(username,password) values(%s,%s)"
-    mycursor.execute(query,values)
-    mydb.commit()
+    #mycursor = mydb.cursor()
+    #query = "create database my_app_db;use my_app_db"
+    #mycursor.execute(query)
+    #mydb.commit()
+    #values = ("root","root")
+    #query = "insert into users(username,password) values(%s,%s)"
+    #mycursor.execute(query,values)
+    #mydb.commit()
 try:
     mycursor = mydb.cursor()    
     query = "create database my_app_db;use my_app_db;"
@@ -42,7 +47,8 @@ except:
     query = "use my_app_db"
     mycursor.execute(query)
 
-try:    
+try:
+    mycursor = mydb.cursor()
     query = "create table users(id int not null auto_increment,username varchar(50) not null,password varchar(100) not null,primary key(id))"
     mycursor.execute(query)
     values = ("root","root")
