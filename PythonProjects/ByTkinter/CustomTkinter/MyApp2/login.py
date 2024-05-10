@@ -1,5 +1,7 @@
 import os
+os.system("pip install tkinter")
 os.system("pip install customtkinter")
+os.system("pip install tkcalendar")
 import init 
 import customtkinter as ctk 
 import mysql.connector as my
