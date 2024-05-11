@@ -4,7 +4,27 @@ import customtkinter as ctk
 import mysql.connector as my
 from tkcalendar import Calendar,DateEntry
 
+def info():
+    id = idDataEntry.get()
 
+    mydb = my.connect(
+        host = "127.0.0.1",
+        user = "root",
+        password = "766900",
+        database = "my_app_db"
+    )
+    print(mydb)
+    mycursor = mydb.cursor()
+    query = "select * from operator_data where dcs_id = %s"
+    values = [id]
+    mycursor.execute(query,values)
+    data = mycursor.fetchall()
+    for i in data:
+        print(i)
+    #operatorDataLabel.configure(text=i)
+    operatorDataTextbox.insert(1.0,i)
+    mydb.close()
+    idDataEntry.delete(0,END)
 
 def insert():
     id = idInsertEntry.get()
@@ -58,11 +78,15 @@ idDataLabel = ctk.CTkLabel(operatorDataFrame,text="Operator's ID:")
 idDataLabel.grid(row=0,column=0)
 idDataEntry = ctk.CTkEntry(operatorDataFrame,width=200)
 idDataEntry.grid(row=0,column=1)
-enterDataButton = ctk.CTkButton(operatorDataFrame,text="Enter")
+enterDataButton = ctk.CTkButton(operatorDataFrame,text="Enter",command=info)
 enterDataButton.grid(row=1,columnspan=2)
 
-operatorDataScrollableFrame = ctk.CTkScrollableFrame(firstFrame,width=200,height=100)
+operatorDataScrollableFrame = ctk.CTkScrollableFrame(firstFrame,width=400,height=100)
 operatorDataScrollableFrame.grid(row=1,column=0)
+#operatorDataLabel = ctk.CTkLabel(operatorDataScrollableFrame,text="")
+#operatorDataLabel.grid(row=0,column=0)
+operatorDataTextbox = ctk.CTkTextbox(operatorDataScrollableFrame,wrap="word")
+operatorDataTextbox.grid(row=1,column=0)
 
 secondFrame = ctk.CTkFrame(rootFrame,width=600,height=600)
 secondFrame.grid(row=0,column=1)
