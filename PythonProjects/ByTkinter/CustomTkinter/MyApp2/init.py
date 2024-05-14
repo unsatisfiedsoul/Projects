@@ -17,9 +17,9 @@ try:
     print(mydb)
 except:
     os.system("sudo apt install mariadb-client mariadb-server")    
+    os.system("sudo mariadbd-safe")
     os.system("sudo mysql_secure_installation")
 
-    os.system("sudo mariadbd-safe")
     #os.system("sudo mariadb -u root -p")
 
     passwd = input("Again input mariadb root password: ")

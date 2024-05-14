@@ -1,4 +1,5 @@
 import os
+import init
 os.system("pip install tkinter")
 os.system("pip install customtkinter")
 os.system("pip install tkcalendar")
