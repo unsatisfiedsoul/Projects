@@ -3,10 +3,20 @@ from tkinter import ttk, END
 import customtkinter as ctk
 import mysql.connector as my
 from tkcalendar import Calendar,DateEntry
+import os
+
+os.system("sudo systemctl start mariadb")
 
 #Function Portion:
 def info():
-    id = idDataEntry.get()
+    id = idShowDataEntry.get()
+
+    idShowEntry.delete(0,END)
+
+    idcsShowEntry.delete(0,END)
+    nameShowEntry.delete(0,END)
+    joinShowEntry.delete(0,END)
+    sectionShowEntry.delete(0,END)
 
     mydb = my.connect(
         host = "127.0.0.1",
@@ -29,13 +39,26 @@ def info():
     joinShowEntry.insert(0,i[3])
     sectionShowEntry.insert(0,i[4])
 
-    #operatorDataLabel.configure(text=i)
-    operatorDataTextbox.delete(1.0,END)
-    operatorDataTextbox.insert(1.0,i)
     mydb.close()
-    idDataEntry.delete(0,END)
+    idShowDataEntry.delete(0,END)
 
     #lists = []
+
+def delete():
+    id = idDeleteDataEntry.get()
+    mydb = my.connect(
+            host = "127.0.0.1",
+            user = "root",
+            password = "766900",
+            database = "my_app_db"
+            )
+    query = "delete from operator_data where dcs_id = %s"
+    values = [id]
+    mycursor = mydb.cursor()
+    mycursor.execute(query,values)
+    mydb.commit()
+    mydb.close()
+    idDeleteDataEntry.delete(0,END)
 
 
 def insert():
@@ -72,6 +95,37 @@ def insert():
     idInsertEntry.delete(0,END)
     nameInsertEntry.delete(0,END)
     
+def section_info():
+
+    id = sectionShowDataOption.get()
+    
+    top = tk.Toplevel(root)
+    #top.geometry("600x600")
+    top.title("Section Data")
+
+    showFrame = ctk.CTkFrame(top)
+    showFrame.pack(expand="yes")
+    showTextbox = ctk.CTkTextbox(showFrame,wrap="none",width=600)
+    showTextbox.grid(row=0,column=0)
+    #showTextbox.insert(1.0,i)
+    
+    mydb = my.connect(
+            host = "127.0.0.1",
+            user = "root",
+            password = "766900",
+            database = "my_app_db"
+            )
+    query = "select * from operator_data where section = %s"
+    values = [id]
+    mycursor = mydb.cursor()
+    mycursor.execute(query,values)
+    info = mycursor.fetchall()
+    for i in info:
+
+        print(i)
+        showTextbox.insert(END,"".join(str(i))+"\n")
+    mydb.close()
+
 
 
 
@@ -85,21 +139,33 @@ rootFrame.pack(expand="Yes")
 #Data Frame Section:
 firstFrame = ctk.CTkFrame(rootFrame,width=600,height=600)
 firstFrame.grid(row=0,column=0)
-operatorDataFrame = ctk.CTkFrame(firstFrame,width=200,height=100)
-operatorDataFrame.grid(row=0,column=0,padx=40,pady=20)
-idDataLabel = ctk.CTkLabel(operatorDataFrame,text="Operator's ID:")
-idDataLabel.grid(row=0,column=0)
-idDataEntry = ctk.CTkEntry(operatorDataFrame,width=200)
-idDataEntry.grid(row=0,column=1)
-enterDataButton = ctk.CTkButton(operatorDataFrame,text="Enter",command=info)
-enterDataButton.grid(row=1,columnspan=2)
 
-operatorDataScrollableFrame = ctk.CTkScrollableFrame(firstFrame,width=400,height=100)
-operatorDataScrollableFrame.grid(row=1,column=0)
-#operatorDataLabel = ctk.CTkLabel(operatorDataScrollableFrame,text="")
-#operatorDataLabel.grid(row=0,column=0)
-operatorDataTextbox = ctk.CTkTextbox(operatorDataScrollableFrame,wrap="word")
-operatorDataTextbox.grid(row=1,column=0)
+operatorShowDataFrame = ctk.CTkFrame(firstFrame,width=200,height=100)
+operatorShowDataFrame.grid(row=0,column=0,padx=40,pady=20)
+
+idShowDataLabel = ctk.CTkLabel(operatorShowDataFrame,text="DCS ID:")
+idShowDataLabel.grid(row=0,column=0)
+idShowDataEntry = ctk.CTkEntry(operatorShowDataFrame,width=200,placeholder_text="DCS0000")
+idShowDataEntry.grid(row=0,column=1)
+enterShowDataButton = ctk.CTkButton(operatorShowDataFrame,text="Show",command=info)
+enterShowDataButton.grid(row=1,columnspan=2)
+
+operatorDeleteDataFrame = ctk.CTkFrame(firstFrame,width=200,height=100)
+operatorDeleteDataFrame.grid(row=2,column=0,padx=40,pady=20)
+idDeleteDataLabel = ctk.CTkLabel(operatorDeleteDataFrame,text="DCS ID:")
+idDeleteDataLabel.grid(row=2,column=0)
+idDeleteDataEntry = ctk.CTkEntry(operatorDeleteDataFrame,width=200,placeholder_text="DCS0000")
+idDeleteDataEntry.grid(row=2,column=1)
+enterDeleteDataButton = ctk.CTkButton(operatorDeleteDataFrame,text="Delete",command=delete)
+enterDeleteDataButton.grid(row=3,columnspan=2)
+
+sectionShowDataLabel = ctk.CTkLabel(operatorShowDataFrame,text="Select Section:")
+sectionShowDataLabel.grid(row=4,column=0)
+sectionShowDataOption = ctk.CTkOptionMenu(operatorShowDataFrame,values = ["Hydrated Lime","Lime Kiln","Pmcc","Store","Boiler","Power House","Utility","Crane","Mechanic","Workshop","Feeding"])
+sectionShowDataOption.grid(row=4,column=1)
+enterShowDataButton = ctk.CTkButton(operatorShowDataFrame,text="Show Section",command=section_info)
+enterShowDataButton.grid(row=5,columnspan=2)
+
 
 #Insert Frame Section:
 secondFrame = ctk.CTkFrame(rootFrame,width=600,height=600)
@@ -107,13 +173,13 @@ secondFrame.grid(row=0,column=1)
 
 operatorInsertFrame = ctk.CTkFrame(secondFrame)
 operatorInsertFrame.grid(row=0,column=0,padx=40,pady=20)
-idInsertLabel = ctk.CTkLabel(operatorInsertFrame,text="ID: ")
+idInsertLabel = ctk.CTkLabel(operatorInsertFrame,text="DCS ID: ")
 idInsertLabel.grid(row=0,column=0)
-idInsertEntry = ctk.CTkEntry(operatorInsertFrame,width=200)
+idInsertEntry = ctk.CTkEntry(operatorInsertFrame,width=200,placeholder_text="DCS0000")
 idInsertEntry.grid(row=0,column=1)
 nameInsertLabel = ctk.CTkLabel(operatorInsertFrame,text="Name: ")
 nameInsertLabel.grid(row=1,column=0)
-nameInsertEntry = ctk.CTkEntry(operatorInsertFrame,width=200)
+nameInsertEntry = ctk.CTkEntry(operatorInsertFrame,width=200,placeholder_text="Firstname Lastname")
 nameInsertEntry.grid(row=1,column=1)
 joinInsertLabel = ctk.CTkLabel(operatorInsertFrame,text="Join Date: ")
 joinInsertLabel.grid(row=2,column=0)
@@ -125,7 +191,7 @@ sectionInsertLabel = ctk.CTkLabel(operatorInsertFrame,text="Section: ")
 sectionInsertLabel.grid(row=4,column=0)
 sectionInsertOption = ctk.CTkOptionMenu(operatorInsertFrame,values=["Hydrated Lime","Power House","Utility","Lime Kiln","Boiler","Crane","Mechanic","Workshop","Store","Pmcc","Feeding"],)
 sectionInsertOption.grid(row=4,column=1)
-enterInsertButton = ctk.CTkButton(operatorInsertFrame,text="Enter",command=insert)
+enterInsertButton = ctk.CTkButton(operatorInsertFrame,text="Insert",command=insert)
 enterInsertButton.grid(row=5,columnspan=2)
 
 #Show Frame Section:
